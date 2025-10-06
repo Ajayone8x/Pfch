@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream</title>
+    
+    <script src="https://ssl.p.jwpcdn.com/player/v/8.32.1/jwplayer.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Custom Tailwind Configuration (optional, but good for consistent theming) */
+        :root {
+            --color-primary-start: #3b82f6; /* Blue 500 */
+            --color-primary-end: #8b5cf6;   /* Violet 500 */
+            --color-telegram: #0088cc;
+            --color-telegram-hover: #007bb5;
+        }
+
+        /* Custom Animations & Base Styles */
+        @keyframes radial-gradient-anim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes neon-glow-pulse {
+            0% { box-shadow: 0 0 5px var(--color-primary-start), 0 0 10px var(--color-primary-end); }
+            50% { box-shadow: 0 0 10px var(--color-primary-start), 0 0 20px var(--color-primary-end); }
+            100% { box-shadow: 0 0 5px var(--color-primary-start), 0 0 10px var(--color-primary-end); }
+        }
+
+        @keyframes telegram-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Aurora animated background */
+        @keyframes aurora-move {
+            0% { transform: translate(-20%, -10%) rotate(0deg); }
+            50% { transform: translate(10%, 10%) rotate(15deg); }
+            100% { transform: translate(-20%, -10%) rotate(0deg); }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 10% 20%, rgba(20, 20, 40, 0.95), rgba(0, 0, 10, 0.95) 90%);
+            background-size: 200% 200%;
+            animation: radial-gradient-anim 30s ease infinite;
+            color: #e2e8f0; /* slate-200 */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 24px;
+            overflow-x: hidden; /* Prevent horizontal scroll from subtle background animation */
+        }
+
+        .aurora-layer {
+            position: fixed;
+            inset: -20% -10% -20% -10%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(60px) saturate(140%);
+            background:
+                radial-gradient(ellipse at 10% 20%, rgba(99,102,241,0.18), transparent 50%),
+                radial-gradient(ellipse at 80% 10%, rgba(34,197,94,0.12), transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(59,130,246,0.14), transparent 50%),
+                radial-gradient(ellipse at 90% 70%, rgba(236,72,153,0.12), transparent 50%);
+            animation: aurora-move 18s ease-in-out infinite;
+        }
+
+        /* Glassmorphic Base */
+        .glass-card {
+            background-color: rgba(30, 41, 59, 0.6); /* slate-800 with transparency */
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(71, 85, 105, 0.4); /* slate-600 with transparency */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            opacity: 0; /* For fade-in animation */
+            transform: translateY(20px); /* For slide-up animation */
+            animation: fade-in-slide-up 0.6s ease-out forwards;
+        }
+
+        /* subtle 3D tilt on hover */
+        .tilt-card { transition: transform 350ms ease, box-shadow 350ms ease; will-change: transform; }
+        .tilt-card:hover { transform: translateY(-6px) rotateX(2deg) rotateY(-2deg); box-shadow: 0 16px 48px rgba(0,0,0,0.35); }
+
+        @keyframes fade-in-slide-up {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Player Specific Styles */
+        #player-wrapper {
+            position: relative;
+            margin-bottom: 24px;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: #000;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fade-in-slide-up 0.6s ease-out 0.2s forwards; /* Delayed animation */
+        }
+
+        #player-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 18px; /* Slightly larger than wrapper */
+            background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end), var(--color-primary-start));
+            background-size: 200% 200%;
+            z-index: -1;
+            filter: blur(5px);
+            animation: neon-glow-pulse 3s infinite ease-in-out, radial-gradient-anim 10s ease infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        #player-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+        }
+
+        /* Custom button styles */
+        .gradient-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
+            background-size: 200% auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .gradient-button:hover {
+            background-position: right center; /* Shift gradient */
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(59, 130, 246, 0.5); /* Enhanced shadow with glow */
+        }
+
+        .gradient-button.copied {
+            background: linear-gradient(90deg, #10b981, #22c55e); /* Emerald green for copied state */
+            background-position: center center;
+            animation: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .telegram-icon {
+            animation: telegram-pulse 2s infinite ease-in-out;
+        }
+
+        /* shiny sweep on buttons */
+        .shiny { position: relative; overflow: hidden; }
+        .shiny::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -120%; height: 100%; width: 120%;
+            background: linear-gradient(120deg, rgba(255,255,255,0.0) 30%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.0) 70%);
+            transform: skewX(-20deg);
+            transition: left 800ms ease;
+        }
+        .shiny:hover::after { left: 120%; }
+
+        /* live badge */
+        @keyframes pulse-live { 0%,100%{ box-shadow: 0 0 0 0 rgba(239,68,68,0.7);} 50%{ box-shadow: 0 0 0 10px rgba(239,68,68,0);} }
+        .live-badge { display:inline-flex; align-items:center; gap:8px; background: rgba(239,68,68,0.15); color:#fecaca; border:1px solid rgba(239,68,68,0.35); padding:6px 10px; border-radius:9999px; font-weight:700; font-size:12px; animation: pulse-live 2s infinite; }
+        .live-dot { height:8px; width:8px; background:#ef4444; border-radius:9999px; }
+
+        /* step badge */
+        .step-badge { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:9999px; font-weight:800; font-size:12px; color:white; background: linear-gradient(135deg, #60a5fa, #a78bfa); box-shadow: 0 6px 18px rgba(99,102,241,0.35); }
+
+        /* Utility classes for layout */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+        .text-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aurora-layer"></div>
+
+    <header class="container mb-6 relative z-10">
+        <div class="glass-card flex items-center justify-between py-4 px-5 animate-[fade-in-slide-up_0.6s_ease-out_forwards]">
+            <div class="flex items-center space-x-3">
+                <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">XC</div>
+                <div>
+                    <div class="text-poppins text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">The Cristers ✕ BigCric</div>
+                    <div class="text-xs text-slate-400">Premium live cricket experience</div>
+                </div>
+            </div>
+            <a href="#" class="hidden sm:inline-flex gradient-button shiny !w-auto !py-2 !px-4 text-sm">Get Updates</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="content"></div>
+    </main>
+    
+    <script>
+        // Set your JW Player Key here
+        jwplayer.key = 'XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo';
+
+        /**
+         * ## STEP 1: Add your stream data here ##
+         * Add a new entry for each channel. The 'id' in the URL must match an id here.
+         * For example: to play 'iccm2', the URL must be .../?id=iccm2
+         */
+        const streams = {
+            "iccm2": {
+                name: "Willow TV",
+                mpd: "https://ottb.live.cf.ww.aiv-cdn.net/sin-nitro/live/dash/enc/yvyxohlatl/out/v1/bedaa948e7a24dc0b5fd5d7b38534d8c/cenc.mpd",
+                keyId: "966aa233d707a532bd18faf6add12757",
+                key: "9f63ef1aacb12647aae5032033335882",
+                poster: "https://mma.prnewswire.com/media/1919551/WillowTV_Logo.jpg?p=facebook"
+            },
+            "test": {
+                name: "Public Test Stream",
+                mpd: "https://storage.googleapis.com/shaka-demo-assets/angel-one-widevine/dash.mpd",
+                keyId: "059a1c766a70568f955652b0a390040d",
+                key: "a2164dd36a61a7a017e4210d33f74ad8",
+                poster: "https://i.ytimg.com/vi/LXb3EKWsInQ/maxresdefault.jpg"
+            }
+            // Add more stream objects here, e.g., "another-id": { ... }
+            // Example for another channel:
+            /*
+            "mychannel": {
+                name: "My Awesome Channel",
+                mpd: "YOUR_MPD_LINK_HERE",
+                keyId: "YOUR_KEY_ID_HERE",
+                key: "YOUR_KEY_HERE",
+                poster: "YOUR_POSTER_IMAGE_URL_HERE"
+            }
+            */
+        };
+
+        /**
+         * ## STEP 2: The code below handles everything automatically ##
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            const contentDiv = document.getElementById('content');
+            
+            // Get the stream ID from the URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const streamId = urlParams.get('id');
+            
+            // Find the corresponding stream data
+            const streamData = streams[streamId];
+            
+            if (streamData) {
+                // If stream data is found, build the player UI
+                document.title = streamData.name + " | Live Stream"; // Update page title
+                buildPlayerUI(streamData);
+                setupPlayer(streamData);
+            } else {
+                // If not found, show an error message
+                showError();
+            }
+        });
+
+        function buildPlayerUI(data) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = `
+                <section class="space-y-5 relative z-10">
+                    <div class="text-center mb-2 opacity-0 translate-y-5 animate-[fade-in-slide-up_0.6s_ease-out_0.1s_forwards]">
+                        <h1 id=\"stream-title\" class=\"text-poppins text-4xl sm:text-5xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500\">${data.name}</h1>
+                    </div>
+                    <div id=\"player-wrapper\" class=\"tilt-card\">
+                        <div id=\"player-container\"></div>
+                    </div>
+
+                    <div class=\"glass-card tilt-card py-6 px-5 flex flex-col\">
+                        <div class=\"flex items-center gap-2 mb-2\"><span class=\"step-badge\">1</span><span class=\"text-slate-300 font-semibold\">Follow us for updates</span></div>
+                        <p class=\"text-sm text-slate-400 mb-4\">Get instant notifications for new high-quality links.</p>
+                        <a href=\"https://t.me/your_telegram_channel\" target=\"_blank\" class=\"gradient-button shiny bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600\">
+                            <svg class=\"telegram-icon mr-3\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\" xmlns=\"http://www.w3.org/2000/svg\">
+                                <path d=\"M21.5 2.5a1.06 1.06 0 0 0-1.4-.3L2.7 10.3c-1.3 1-1 2.8.3 3.5l4.8 2.3 2.3 4.8c.7 1.3 2.5 1.6 3.5.3l8.1-17.4c.5-.9.3-2.1-.4-2.8Z\"/>
+                            </svg>
+                            Click Here To Join Telegram For More Links
+                        </a>
+                    </div>
+
+                    <div class=\"glass-card tilt-card py-6 px-5 flex flex-col\">
+                        <div class=\"flex items-center gap-2 mb-2\"><span class=\"step-badge\">2</span><span class=\"text-slate-300 font-semibold\">Open in Chrome</span><span class=\"ml-3 live-badge\"><span class=\"live-dot\"></span> LIVE</span></div>
+                        <p class=\"text-sm text-slate-400 mb-4\">Best performance and ad-free experience on Chrome.</p>
+                        <button class=\"gradient-button shiny share-button bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600\" id=\"shareButton\">
+                            <svg class=\"mr-3\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\" xmlns=\"http://www.w3.org/2000/svg\">
+                                <path d=\"M18 16a4 4 0 1 0-5.3 3.5l-4.2 2a4 4 0 1 0 0-7l4.2-2A4 4 0 1 0 18 16Z\"/>
+                            </svg>
+                            Copy Link & Open in Chrome
+                        </button>
+                    </div>
+                </section>
+            `;
+            
+            // Add event listener for the new share button
+            const shareButton = document.getElementById('shareButton');
+            shareButton.addEventListener('click', () => copyAndShare(shareButton));
+        }
+
+        function setupPlayer(data) {
+             jwplayer("player-container").setup({
+                file: data.mpd,
+                image: data.poster,
+                autostart: true,
+                width: '100%',
+                aspectratio: '16:9',
+                mute: false, /* Start muted to avoid autoplay restrictions */
+                preload: 'auto',
+                captions: { color: 'white', fontSize: '16px', backgroundOpacity: 0 },
+                sharing: {
+                    sites: ['facebook', 'twitter']
+                },
+                drm: {
+                    "clearkey": {
+                        "keyId": data.keyId,
+                        "key": data.key
+                    }
+                }
+            });
+        }
+        
+        function showError() {
+            const contentDiv = document.getElementById('content');
+            document.title = "Stream Not Found | Live Stream";
+            contentDiv.innerHTML = `
+                <div class="glass-card text-center py-10 px-6 animate-[fade-in-slide-up_0.6s_ease-out_forwards]">
+                    <h2 class="text-poppins text-3xl font-bold text-red-400 mb-4">🚫 Stream Not Found</h2>
+                    <p class="text-lg text-slate-300">The requested live stream could not be found or the link is invalid/expired.</p>
+                    <p class="text-md text-slate-400 mt-4">Please ensure you have the correct URL or try again later.</p>
+                </div>
+            `;
+        }
+        
+        async function copyAndShare(button) {
+            const shareUrl = window.location.href;
+            const originalText = button.innerHTML;
+
+            try {
+                // Use Web Share API if available (on mobile)
+                if (navigator.share) {
+                    await navigator.share({
+                        title: document.title,
+                        url: shareUrl
+                    });
+                    button.innerHTML = '✅ Link Shared!';
+                    setTimeout(() => { button.innerHTML = originalText; }, 1800);
+                    return; // Exit after successful native share
+                }
+
+                // Fallback to clipboard for desktops
+                await navigator.clipboard.writeText(shareUrl);
+                
+                button.innerHTML = '✅ Link Copied! Open Chrome and paste';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+
+            } catch (err) {
+                console.error('Failed to copy or share: ', err);
+                button.innerHTML = '⚠️ Could not copy link';
+                 setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            }
+        }
+    </script>
+
+</body>
+</html>
