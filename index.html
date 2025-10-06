@@ -212,11 +212,7 @@
         // Set your JW Player Key here
         jwplayer.key = 'XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo';
 
-        /**
-         * ## STEP 1: Add your stream data here ##
-         * Add a new entry for each channel. The 'id' in the URL must match an id here.
-         * For example: to play 'iccm2', the URL must be .../?id=iccm2
-         */
+   
         const streams = {
             "peng": {
                 name: "prime english",
@@ -232,8 +228,6 @@
                 key: "893eacfabe386144b81733d622a7ad17",
                 poster: "https://i.ytimg.com/vi/LXb3EKWsInQ/maxresdefault.jpg"
             }
-            // Add more stream objects here, e.g., "another-id": { ... }
-            // Example for another channel:
             
             "phin": {
                 name: "prime hindi",
@@ -273,9 +267,7 @@
             
         };
 
-        /**
-         * ## STEP 2: The code below handles everything automatically ##
-         */
+      
         document.addEventListener('DOMContentLoaded', () => {
             const contentDiv = document.getElementById('content');
             
