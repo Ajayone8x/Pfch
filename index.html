@@ -246,45 +246,44 @@
                 keyId: "a6dfc4f17d70d8d07639659193f03b25",
                 key: "893eacfabe386144b81733d622a7ad17",
                 poster: "https://i.ytimg.com/vi/LXb3EKWsInQ/maxresdefault.jpg"
-            }
-            
+            },
             "phin": {
                 name: "prime hindi",
                 mpd: "https://abbbmftaaaaaaaamgdshloqn26zka.otte.live.cf.ww.aiv-cdn.net/sin-nitro/live/dash/enc/jr0zvtazlv/out/v1/6bae9634f7594a738530656284177423/cenc.mpd",
                 keyId: "1416f69da90f62735a6521aae461dd74",
                 key: "2ce2e7d0af813fd26c6fe0b59201ced5",
-                poster: "YOUR_POSTER_IMAGE_URL_HERE"
-            }
-		"wcb": {
+                poster: "https://via.placeholder.com/1280x720/000000/FFFFFF.png?text=+"
+            }, // <-- Added comma
+            "wcb": {
                 name: "Willow By Cricbuzz",
                 mpd: "https://abaggkzaaaaaaaamfjv2jyrjdxcj4.otte.live.cf.ww.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/z4fzqchcb9/out/v1/707fd829f17c40838944467dffda1b01/cenc.mpd",
                 keyId: "9cdf68fd8065a7d24042425180afc3f8",
                 key: "7432fe555db06e54ef11a7dbd41e2888",
-                poster: "YOUR_POSTER_IMAGE_URL_HERE"
-            }
-		"willow": {
+                poster: "https://via.placeholder.com/1280x720/000000/FFFFFF.png?text=+"
+            }, // <-- Added comma
+            "willow": {
                 name: "Willow",
                 mpd: "https://ottb.live.cf.ww.aiv-cdn.net/bom-nitro/live/clients/dash/enc/f60kqesunw/out/v1/a435ed7a00f947deb4369b46d8f2fb70/cenc.mpd",
                 keyId: "1779c27b9d077a3ba0c9cc1bb9a94b9f",
                 key: "cc5cf3b7928fb9e0a1ee6a8b566f0a8e",
-                poster: "YOUR_POSTER_IMAGE_URL_HERE"
-            }
-		"tnt2": {
+                poster: "https://via.placeholder.com/1280x720/000000/FFFFFF.png?text=+"
+            }, // <-- Added comma
+            "tnt2": {
                 name: "Tnt 2",
                 mpd: "https://ottb.live.cf.ww.aiv-cdn.net/sin-nitro/live/dash/enc/f0qvkrra8j/out/v1/f8fa17f087564f51aa4d5c700be43ec4/cenc.mpd",
                 keyId: "0d9efa8287a52a2497a281f7a9012211",
                 key: "e4f832d372943014fe5c30928a90e547",
-                poster: "YOUR_POSTER_IMAGE_URL_HERE"
-            }
-		"tnt3": {
+                poster: "https://via.placeholder.com/1280x720/000000/FFFFFF.png?text=+"
+            }, // <-- Added comma
+            "tnt3": {
                 name: "Tnt 3",
                 mpd: "https://ottb.live.cf.ww.aiv-cdn.net/lhr-nitro/live/dash/enc/lsdasbvglv/out/v1/bb548a3626cd4708afbb94a58d71dce9/cenc.mpd",
                 keyId: "08efc7fb107981608f7b64db5ea62469",
                 key: "3a6844bc9f0d9d9fd962639d7e4eb76a",
-                poster: "YOUR_POSTER_IMAGE_URL_HERE"
+                poster: "https://via.placeholder.com/1280x720/000000/FFFFFF.png?text=+"
             }
-            
         };
+
         document.addEventListener('DOMContentLoaded', () => {
             const contentDiv = document.getElementById('content');
             const urlParams = new URLSearchParams(window.location.search);
@@ -346,7 +345,6 @@
             
             const ui = new shaka.ui.Overlay(player, container, video);
 
-            // Explicitly configure the UI to include the quality selector
             const uiConfig = {
                 'controlPanelElements': [
                     'play_pause',
@@ -359,14 +357,13 @@
                 ],
                 'settingsMenuButtons': [
                     'captions',
-                    'quality', // This ensures the quality button is in the menu
+                    'quality',
                     'language',
                     'rate'
                 ]
             };
             ui.configure(uiConfig);
             
-            // Configure the player for DRM and ABR
             player.configure({
                 drm: {
                     clearKeys: {
@@ -374,7 +371,7 @@
                     }
                 },
                 abr: {
-                    enabled: true // Ensure ABR is enabled
+                    enabled: true
                 }
             });
 
